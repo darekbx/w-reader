@@ -3,19 +3,16 @@ import 'package:flutter/material.dart';
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
 
+  int _tagsCount = 6;
   bool _addButtonVisible = false;
 
   @override
   _ReaderPageState createState() => _ReaderPageState();
 }
 
-class _ReaderPageState extends State<ReaderPage> with SingleTickerProviderStateMixin {
-
-  final List<Tab> _tabs = <Tab>[
-    Tab(text: "News feed"), 
-    Tab(text: "Tags (6)")
-  ];
-
+class _ReaderPageState extends State<ReaderPage>
+    with SingleTickerProviderStateMixin {
+  List<Tab> _tabs;
   TabController _tabController;
 
   @override
@@ -31,6 +28,10 @@ class _ReaderPageState extends State<ReaderPage> with SingleTickerProviderStateM
   }
 
   void _initializeTabController() {
+    _tabs = <Tab>[
+      Tab(text: "News feed"),
+      Tab(text: "Tags (${widget._tagsCount})")
+    ];
     _tabController = TabController(vsync: this, length: _tabs.length);
     _tabController.addListener(() {
       setState(() {
@@ -56,17 +57,11 @@ class _ReaderPageState extends State<ReaderPage> with SingleTickerProviderStateM
         child: Scaffold(
           appBar: AppBar(
             title: Text("Reader"),
-            bottom: TabBar(
-              controller: _tabController,
-              tabs: _tabs
-            ),
+            bottom: TabBar(controller: _tabController, tabs: _tabs),
           ),
           body: TabBarView(
             controller: _tabController,
-            children: <Widget>[
-              Text("A"),
-              Text("B")
-            ],
+            children: <Widget>[Text("A"), Text("B")],
           ),
           floatingActionButton: addButton,
         ));
