@@ -1,4 +1,4 @@
-package com.example.w_reader;
+package com.w_reader;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
