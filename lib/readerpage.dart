@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
 
-  int _tagsCount = 6;
-  bool _addButtonVisible = false;
-
   @override
   _ReaderPageState createState() => _ReaderPageState();
 }
 
 class _ReaderPageState extends State<ReaderPage>
     with SingleTickerProviderStateMixin {
+
+  bool _addButtonVisible = false;
+  int _tagsCount = 6;
   List<Tab> _tabs;
   TabController _tabController;
 
@@ -28,14 +28,11 @@ class _ReaderPageState extends State<ReaderPage>
   }
 
   void _initializeTabController() {
-    _tabs = <Tab>[
-      Tab(text: "News feed"),
-      Tab(text: "Tags (${widget._tagsCount})")
-    ];
+    loadTabs();
     _tabController = TabController(vsync: this, length: _tabs.length);
     _tabController.addListener(() {
       setState(() {
-        widget._addButtonVisible = _tabController.index == 1;
+        _addButtonVisible = _tabController.index == 1;
       });
     });
   }
@@ -44,9 +41,16 @@ class _ReaderPageState extends State<ReaderPage>
   Widget build(BuildContext context) {
     var addButton;
 
-    if (widget._addButtonVisible) {
+    if (_addButtonVisible) {
       addButton = FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          
+          setState(() {
+            _tagsCount++;
+            loadTabs();
+          });
+
+        },
         tooltip: 'Add tag',
         child: Icon(Icons.add),
       );
@@ -65,5 +69,12 @@ class _ReaderPageState extends State<ReaderPage>
           ),
           floatingActionButton: addButton,
         ));
+  }
+
+  void loadTabs() {
+    _tabs = <Tab>[
+      Tab(text: "News feed"),
+      Tab(text: "Tags ($_tagsCount)")
+    ];
   }
 }
