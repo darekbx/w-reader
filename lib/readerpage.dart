@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:w_reader/newsfeed/newsfeed.dart';
+import 'package:w_reader/tags/tags.dart';
+import 'package:w_reader/tags/tagstorage.dart';
 
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
+
+  final _tagStorage = TagStorage();
 
   @override
   _ReaderPageState createState() => _ReaderPageState();
@@ -10,14 +14,20 @@ class ReaderPage extends StatefulWidget {
 
 class _ReaderPageState extends State<ReaderPage>
     with SingleTickerProviderStateMixin {
-  bool _addButtonVisible = false;
-  int _tagsCount = 6;
+
+  NewsFeed _newsFeed = NewsFeed();
+  int _tagsCount = 0;
+  Tags _tags = Tags();
   List<Tab> _tabs;
   TabController _tabController;
 
   @override
   void initState() {
     _initializeTabController();
+
+    _tags.reload = () => _loadTagsCount();
+    _loadTagsCount();
+
     super.initState();
   }
 
@@ -27,54 +37,36 @@ class _ReaderPageState extends State<ReaderPage>
     super.dispose();
   }
 
+  void _loadTagsCount() async {
+    var count = await widget._tagStorage.countTags();
+    
+    setState(() {
+      _tagsCount = count;
+      _loadTabs();
+    });
+  }
+
   void _initializeTabController() {
     _loadTabs();
     _tabController = TabController(vsync: this, length: _tabs.length);
-    _tabController.addListener(() {
-      setState(() {
-        _addButtonVisible = _tabController.index == 1;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var addButton;
-
-    if (_addButtonVisible) {
-      addButton = _createAddButton();
-    }
-
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-          appBar: AppBar(
-            title: Text("Reader"),
-            bottom: TabBar(controller: _tabController, tabs: _tabs),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            children: <Widget>[Text("A"), NewsFeed()],
-          ),
-          floatingActionButton: addButton,
-        ));
+            appBar: AppBar(
+              title: Text("Reader"),
+              bottom: TabBar(controller: _tabController, tabs: _tabs),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: <Widget>[_newsFeed, _tags],
+            )));
   }
 
   void _loadTabs() {
-    _tabs = <Tab>[
-      Tab(text: "News feed"), 
-      Tab(text: "Tags ($_tagsCount)")
-    ];
+    _tabs = <Tab>[Tab(text: "News feed"), Tab(text: "Tags ($_tagsCount)")];
   }
-
-  Widget _createAddButton() => FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _tagsCount++;
-            _loadTabs();
-          });
-        },
-        tooltip: 'Add tag',
-        child: Icon(Icons.add),
-      );
 }
