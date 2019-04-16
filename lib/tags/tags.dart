@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tagstorage.dart';
+import 'package:w_reader/commonwidgets.dart';
+import 'tag.dart';
 
 class Tags extends StatefulWidget {
   Tags();
@@ -19,7 +21,9 @@ class _TagsState extends State<Tags> {
   }
 
   void _addTag() async {
+    
     await widget._tagStorage.addTag('Test');
+
     if (widget.reload != null) {
       widget.reload();
     }
@@ -48,11 +52,8 @@ class _TagsState extends State<Tags> {
     );
   }
 
-  Widget _tagItem(String tag) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Text(tag),
-    );
+  Widget _tagItem(String tagName) {
+    return Tag(tagName);
   }
 
   _handleTagsFuture(
@@ -60,27 +61,17 @@ class _TagsState extends State<Tags> {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
       case ConnectionState.waiting:
-        return _buildLoadingView();
+        return CommonWidgets.loadingView();
       default:
         if (snapshot.hasError) {
-          return _buildError(snapshot.error);
+          return CommonWidgets.error(snapshot.error);
         } else {
           if (snapshot.data == null) {
-            return _buildError("Error :( ");
+            return CommonWidgets.error("Error :( ");
           } else {
             return callback(snapshot.data);
           }
         }
     }
   }
-
-  _buildLoadingView() => Center(
-        child: CircularProgressIndicator(),
-      );
-
-  _buildError(String errorMessage) => Center(
-          child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Text(errorMessage),
-      ));
 }
