@@ -4,7 +4,7 @@ class Tag extends StatefulWidget {
 
   final String tagName;
 
-  Tag(String this.tagName);
+  Tag(this.tagName);
 
   @override
   _TagState createState() => _TagState();
