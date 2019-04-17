@@ -35,11 +35,11 @@ class _TagsState extends State<Tags> {
       body: FutureBuilder(
         future: widget._tagStorage.fetchTags(),
         builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-          return _handleTagsFuture(snapshot, (data) {
+          return CommonWidgets.handleFuture(snapshot, (data) {
             return ListView.builder(
-              itemCount: data.length,
+              itemCount: (data as List<String>).length,
               itemBuilder: (BuildContext context, index) =>
-                  _tagItem(data[index]),
+                  _tagItem((data as List<String>)[index]),
             );
           });
         },
@@ -54,24 +54,5 @@ class _TagsState extends State<Tags> {
 
   Widget _tagItem(String tagName) {
     return Tag(tagName);
-  }
-
-  _handleTagsFuture(
-      AsyncSnapshot<List<String>> snapshot, Function(List<String>) callback) {
-    switch (snapshot.connectionState) {
-      case ConnectionState.none:
-      case ConnectionState.waiting:
-        return CommonWidgets.loadingView();
-      default:
-        if (snapshot.hasError) {
-          return CommonWidgets.error(snapshot.error);
-        } else {
-          if (snapshot.data == null) {
-            return CommonWidgets.error("Error :( ");
-          } else {
-            return callback(snapshot.data);
-          }
-        }
-    }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:w_reader/api/api.dart';
+import 'package:w_reader/commonwidgets.dart';
 
 class Tag extends StatefulWidget {
 
@@ -12,12 +14,21 @@ class Tag extends StatefulWidget {
 
 class _TagState extends State<Tag> {
 
+
   @override
   Widget build(BuildContext context) {
-    
     return Padding(
       padding: EdgeInsets.all(16),
-      child: Text("${widget.tagName} (5234)"),
+      child: FutureBuilder(
+        future: Api("").loadTagContents(widget.tagName),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          return CommonWidgets.handleFuture(snapshot, (data) {
+            return _tagView((data as String).length);
+          });
+        },
+      ),
     );
   }
+
+  Widget _tagView(int count) => Text("${widget.tagName} ($count)");
 }
