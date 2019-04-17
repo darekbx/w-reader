@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:w_reader/newsfeed/newsfeed.dart';
 import 'package:w_reader/tags/tags.dart';
-import 'package:w_reader/tags/tagstorage.dart';
+import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/settings/settings.dart';
 
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
 
-  final _tagStorage = TagStorage();
+  final _tagStorage = LocalStorage();
 
   @override
   _ReaderPageState createState() => _ReaderPageState();
@@ -14,7 +15,6 @@ class ReaderPage extends StatefulWidget {
 
 class _ReaderPageState extends State<ReaderPage>
     with SingleTickerProviderStateMixin {
-
   NewsFeed _newsFeed = NewsFeed();
   int _tagsCount = 0;
   Tags _tags = Tags();
@@ -39,7 +39,7 @@ class _ReaderPageState extends State<ReaderPage>
 
   void _loadTagsCount() async {
     var count = await widget._tagStorage.countTags();
-    
+
     setState(() {
       _tagsCount = count;
       _loadTabs();
@@ -58,6 +58,15 @@ class _ReaderPageState extends State<ReaderPage>
         child: Scaffold(
             appBar: AppBar(
               title: Text("Reader"),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Settings()));
+                  },
+                ),
+              ],
               bottom: TabBar(controller: _tabController, tabs: _tabs),
             ),
             body: TabBarView(

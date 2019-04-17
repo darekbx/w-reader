@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tagstorage.dart';
+import 'package:w_reader/localstorage.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'tag.dart';
 
@@ -7,7 +7,7 @@ class Tags extends StatefulWidget {
   Tags();
 
   Function reload;
-  final _tagStorage = TagStorage();
+  final _tagStorage = LocalStorage();
 
   @override
   _TagsState createState() => _TagsState();
