@@ -10,13 +10,13 @@ class Api {
   final String apiKey;
   final String _endpoint = "http://a.wykop.pl";
 
-  Future<String> loadTagContents(String tag, {int page = 0}) async {
+  Future<String> loadTagContents(String tag, {int page = 0, bool forceRefresh = false}) async {
     if (apiKey == null) {
       return "";
     }
 
     var cachedContents = ApiCache.get(tag);
-    if (cachedContents != null) {
+    if (cachedContents != null && !forceRefresh) {
       return cachedContents;
     }
 

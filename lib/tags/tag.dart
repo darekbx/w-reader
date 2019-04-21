@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:w_reader/api/api.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'package:w_reader/localstorage.dart';
+import 'dart:convert';
 
 class Tag extends StatefulWidget {
-
   final String tagName;
 
   Tag(this.tagName);
@@ -14,8 +14,8 @@ class Tag extends StatefulWidget {
 }
 
 class _TagState extends State<Tag> {
-
   var _localStorage = LocalStorage();
+  var _forceRefresh = false;
   var _apiKey;
 
   @override
@@ -36,15 +36,37 @@ class _TagState extends State<Tag> {
     return Padding(
       padding: EdgeInsets.all(16),
       child: FutureBuilder(
-        future: Api(_apiKey).loadTagContents(widget.tagName),
+        future: Api(_apiKey).loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           return CommonWidgets.handleFuture(snapshot, (data) {
-            return _tagView((data as String).length);
+            _forceRefresh = false;
+            return _tagView(data as String);
           });
         },
       ),
     );
   }
 
-  Widget _tagView(int count) => Text("${widget.tagName} ($count)");
+  Widget _tagView(String contents) {
+    var json = JsonDecoder().convert(contents);
+    if (json["error"] == null) {
+      var total = json["meta"]["counters"]["total"];
+      return Text("#${widget.tagName} ($total)");
+    } else {
+      return _errorView(json["error"]["message"]);
+    }
+  }
+
+  Widget _errorView(String message) =>
+      Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+        Expanded(child: Text(message, style: TextStyle(color: Colors.red))),
+        FlatButton(
+          child: Icon(Icons.refresh),
+          onPressed: () {
+            setState(() {
+              _forceRefresh = true;
+            });
+          },
+        )
+      ]);
 }

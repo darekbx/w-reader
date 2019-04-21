@@ -22,7 +22,7 @@ class _TagsState extends State<Tags> {
 
   void _addTag() async {
     
-    await widget._tagStorage.addTag('Test');
+    await widget._tagStorage.addTag('bikepacking');
 
     if (widget.reload != null) {
       widget.reload();
