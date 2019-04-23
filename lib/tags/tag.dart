@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:w_reader/api/api.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/items/itemslist.dart';
 import 'dart:convert';
 
 class Tag extends StatefulWidget {
@@ -36,7 +37,8 @@ class _TagState extends State<Tag> {
     return Padding(
       padding: EdgeInsets.all(16),
       child: FutureBuilder(
-        future: Api(_apiKey).loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
+        future: Api(_apiKey)
+            .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           return CommonWidgets.handleFuture(snapshot, (data) {
             _forceRefresh = false;
@@ -51,9 +53,15 @@ class _TagState extends State<Tag> {
     var json = JsonDecoder().convert(contents);
     if (json["error"] == null) {
       var total = json["meta"]["counters"]["total"];
-      return Text("#${widget.tagName} ($total)");
+      return InkWell(
+        child: Text("#${widget.tagName} ($total)"),
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ItemsList(json)));
+        },
+      );
     } else {
-      return _errorView(json["error"]["message"]);
+      return _errorView(json["error"]["message_en"]);
     }
   }
 

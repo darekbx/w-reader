@@ -8,9 +8,9 @@ class Api {
   Api(this.apiKey);
 
   final String apiKey;
-  final String _endpoint = "http://a.wykop.pl";
+  final String _endpoint = "http://a2.wykop.pl";
 
-  Future<String> loadTagContents(String tag, {int page = 0, bool forceRefresh = false}) async {
+  Future<String> loadTagContents(String tag, {int page = 1, bool forceRefresh = false}) async {
     if (apiKey == null) {
       return "";
     }
@@ -20,7 +20,7 @@ class Api {
       return cachedContents;
     }
 
-    var url = "$_endpoint/tag/$tag/page/$page/appkey/$apiKey";
+    var url = "$_endpoint/tags/$tag/page/$page/appkey/$apiKey";
     var response = await get(url);
     if (response.statusCode == HttpStatus.ok) {
       var contents = response.body;
