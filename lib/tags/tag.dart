@@ -50,18 +50,22 @@ class _TagState extends State<Tag> {
   }
 
   Widget _tagView(String contents) {
-    var json = JsonDecoder().convert(contents);
-    if (json["error"] == null) {
-      var total = json["meta"]["counters"]["total"];
-      return InkWell(
-        child: Text("#${widget.tagName} ($total)"),
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ItemsList(json)));
-        },
-      );
+    if (contents.isNotEmpty) {
+      var json = JsonDecoder().convert(contents);
+      if (json["error"] == null) {
+        var total = json["meta"]["counters"]["total"];
+        return InkWell(
+          child: Text("#${widget.tagName} ($total)"),
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ItemsList(json, widget.tagName)));
+          },
+        );
+      } else {
+        return _errorView(json["error"]["message_en"]);
+      }
     } else {
-      return _errorView(json["error"]["message_en"]);
+      return Text("Check api key");
     }
   }
 
