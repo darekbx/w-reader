@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:w_reader/api/api.dart';
 
 class ItemsList extends StatefulWidget {
 
@@ -72,7 +74,19 @@ class _ItemsListState extends State<ItemsList> {
     return Html(
       data: html,
       onLinkTap: (url) { 
-        throw Exception("TODO");
+        if (url[0] == "#") {
+          url = "${Api.tagPrefix()}${url.substring(1)}";
+        }
+        _launchURL(url);
       });
+  }
+
+  _launchURL(String url) async {
+    print(url);
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

@@ -9,6 +9,7 @@ class Api {
 
   final String apiKey;
   final String _endpoint = "http://a2.wykop.pl";
+  static String tagPrefix() => "https://www.wykop.pl/tag/";
 
   Future<String> loadTagContents(String tag, {int page = 1, bool forceRefresh = false}) async {
     if (apiKey == null) {
