@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CommonWidgets {
-
   static handleFuture(
       AsyncSnapshot<dynamic> snapshot, Function(dynamic) callback) {
     switch (snapshot.connectionState) {
@@ -21,9 +20,13 @@ class CommonWidgets {
     }
   }
 
-  static loadingView() => Center(
-        child: CircularProgressIndicator(),
-      );
+  static loadingView() =>
+      Column(
+        mainAxisAlignment: MainAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(child: CircularProgressIndicator(), width: 16, height: 16)
+      ]);
 
   static error(String errorMessage) => Center(
           child: Padding(

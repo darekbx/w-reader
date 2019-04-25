@@ -4,7 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:w_reader/api/api.dart';
 
 class ItemsList extends StatefulWidget {
-
   final dynamic data;
   final String tagName;
 
@@ -15,19 +14,17 @@ class ItemsList extends StatefulWidget {
 }
 
 class _ItemsListState extends State<ItemsList> {
-  
   @override
   Widget build(BuildContext context) {
     var list = (widget.data["data"] as List);
     return Scaffold(
-      appBar: AppBar(title: Text("#${widget.tagName}")),
-      body:   
-      ListView.separated(
-        separatorBuilder: (BuildContext context, index) => Divider(color: Colors.black),
-        itemCount: list.length,
-        itemBuilder: (BuildContext context, index) => _buildItem(list[index]),
-      )
-    );
+        appBar: AppBar(title: Text("#${widget.tagName}")),
+        body: ListView.separated(
+          separatorBuilder: (BuildContext context, index) =>
+              Divider(color: Colors.black),
+          itemCount: list.length,
+          itemBuilder: (BuildContext context, index) => _buildItem(list[index]),
+        ));
   }
 
   Widget _buildItem(dynamic row) {
@@ -43,42 +40,72 @@ class _ItemsListState extends State<ItemsList> {
   Widget _buildEntry(dynamic entry) {
     var embed = entry["embed"];
     if (embed != null) {
-      var url = embed["url"];
       var preview = embed["preview"];
+      var url = embed["url"];
+      var previewImage = _createPreviewImage(preview, url);
       return Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.network(preview),
-            _handleHtml(entry['body'])
-          ]
-        )
-      );
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[previewImage, _buildEntryContents(entry)]));
     } else {
       return Padding(
-        padding: EdgeInsets.all(16),
-        child: _handleHtml(entry['body'])
-      );
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: _buildEntryContents(entry));
     }
   }
 
-  Widget _buildLink(dynamic link) {
+  Widget _createPreviewImage(String previewUrl, String url) {
     return Padding(
-      padding: EdgeInsets.all(16),
-      child: Text("link")
-    );
+        padding: EdgeInsets.only(bottom: 8),
+        child: InkWell(
+            child: Image.network(previewUrl),
+            onTap: () {
+              _launchURL(url);
+            }));
   }
-  
+
+  Widget _buildLink(dynamic link) {
+    return Padding(padding: EdgeInsets.all(16), child: Text("link"));
+  }
+
+  Widget _buildEntryContents(dynamic entry) {
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(bottom: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Expanded(
+                      child: Text(entry["date"],
+                          style: TextStyle(color: Colors.black45))),
+                  InkWell(
+                    child: Text("Comments count: ${entry["comments_count"]}",
+                        style: TextStyle(
+                            color: Colors.black45,
+                            decoration: TextDecoration.underline)),
+                    onTap: () {
+                      var url = Api.itemUrl(entry["id"]);
+                      _launchURL(url);
+                    },
+                  )
+                ],
+              )),
+          _handleHtml(entry['body'])
+        ]);
+  }
+
   Widget _handleHtml(String html) {
     return Html(
-      data: html,
-      onLinkTap: (url) { 
-        if (url[0] == "#") {
-          url = "${Api.tagPrefix()}${url.substring(1)}";
-        }
-        _launchURL(url);
-      });
+        data: html,
+        onLinkTap: (url) {
+          if (url[0] == "#") {
+            url = Api.tagUrl(url.substring(1));
+          }
+          _launchURL(url);
+        });
   }
 
   _launchURL(String url) async {

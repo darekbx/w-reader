@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:http/http.dart';
 import 'apicache.dart';
 
@@ -9,7 +8,8 @@ class Api {
 
   final String apiKey;
   final String _endpoint = "http://a2.wykop.pl";
-  static String tagPrefix() => "https://www.wykop.pl/tag/";
+  static String tagUrl(String tag) => "https://www.wykop.pl/tag/$tag";
+  static String itemUrl(int id) => "https://www.wykop.pl/wpis/$id";
 
   Future<String> loadTagContents(String tag, {int page = 1, bool forceRefresh = false}) async {
     if (apiKey == null) {
