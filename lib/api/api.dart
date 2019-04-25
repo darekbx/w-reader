@@ -22,6 +22,7 @@ class Api {
     }
 
     var url = "$_endpoint/tags/$tag/page/$page/appkey/$apiKey";
+    print(url);
     var response = await get(url);
     if (response.statusCode == HttpStatus.ok) {
       var contents = response.body;

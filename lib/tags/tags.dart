@@ -14,19 +14,44 @@ class Tags extends StatefulWidget {
 }
 
 class _TagsState extends State<Tags> {
-  void addPressed() {
-    setState(() {
-      _addTag();
-    });
+  var _tagFieldController = TextEditingController();
+
+  void _addTagDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Add new tag"),
+            content: TextField(
+              controller: _tagFieldController,
+              decoration: InputDecoration(hintText: "Tag name without #"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text("Add"),
+                  onPressed: () {
+                    setState(() {
+                      _addTag(_tagFieldController.text);
+                      _tagFieldController.clear();
+                    });
+                    Navigator.pop(context);
+                  }),
+            ],
+          );
+        });
   }
 
-  void _addTag() async {
-    
-    await widget._tagStorage.addTag('bikepacking');
-
+  void _addTag(String tag) async {
+    await widget._tagStorage.addTag(tag);
     if (widget.reload != null) {
       widget.reload();
     }
+  }
+
+  @override
+  void dispose() {
+    _tagFieldController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,7 +70,7 @@ class _TagsState extends State<Tags> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => addPressed(),
+        onPressed: () => _addTagDialog(context),
         tooltip: 'Add tag',
         child: Icon(Icons.add),
       ),

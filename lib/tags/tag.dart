@@ -34,18 +34,15 @@ class _TagState extends State<Tag> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: FutureBuilder(
-        future: Api(_apiKey)
-            .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          return CommonWidgets.handleFuture(snapshot, (data) {
-            _forceRefresh = false;
-            return _tagView(data as String);
-          });
-        },
-      ),
+    return FutureBuilder(
+      future: Api(_apiKey)
+          .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        return CommonWidgets.handleFuture(snapshot, (data) {
+          _forceRefresh = false;
+          return _tagView(data as String);
+        });
+      },
     );
   }
 
@@ -55,11 +52,21 @@ class _TagState extends State<Tag> {
       if (json["error"] == null) {
         var total = json["meta"]["counters"]["total"];
         return InkWell(
-          child: Text("#${widget.tagName} ($total)"),
+          child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text("#${widget.tagName} ($total)")),
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ItemsList(json, widget.tagName)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ItemsList(json, widget.tagName)));
           },
+          onLongPress: () {
+            setState(() {
+              // TODO: Reload tags
+              _localStorage.deleteTag(widget.tagName);
+            });
+          }
         );
       } else {
         return _errorView(json["error"]["message_en"]);
@@ -69,8 +76,9 @@ class _TagState extends State<Tag> {
     }
   }
 
-  Widget _errorView(String message) =>
-      Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+  Widget _errorView(String message) => Padding(
+      padding: EdgeInsets.only(left: 16),
+      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
         Expanded(child: Text(message, style: TextStyle(color: Colors.red))),
         FlatButton(
           child: Icon(Icons.refresh),
@@ -80,5 +88,5 @@ class _TagState extends State<Tag> {
             });
           },
         )
-      ]);
+      ]));
 }
