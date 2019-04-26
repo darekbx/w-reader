@@ -38,36 +38,35 @@ class _TagState extends State<Tag> {
       future: Api(_apiKey)
           .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        return CommonWidgets.handleFuture(snapshot, (data) {
-          _forceRefresh = false;
-          return _tagView(data as String);
-        });
+        return Padding(
+            padding: EdgeInsets.all(16),
+            child: CommonWidgets.handleFuture(snapshot, (jsonString) {
+              _forceRefresh = false;
+              return _tagView(jsonString as String);
+            }));
       },
     );
   }
 
-  Widget _tagView(String contents) {
-    if (contents.isNotEmpty) {
-      var json = JsonDecoder().convert(contents);
+  Widget _tagView(String jsonString) {
+    if (jsonString.isNotEmpty) {
+      var json = JsonDecoder().convert(jsonString);
       if (json["error"] == null) {
         var total = json["meta"]["counters"]["total"];
         return InkWell(
-          child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Text("#${widget.tagName} ($total)")),
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ItemsList(json, widget.tagName)));
-          },
-          onLongPress: () {
-            setState(() {
-              // TODO: Reload tags
-              _localStorage.deleteTag(widget.tagName);
+            child: Text("#${widget.tagName} ($total)"),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ItemsList(json, widget.tagName)));
+            },
+            onLongPress: () {
+              setState(() {
+                // TODO: Reload tags
+                _localStorage.deleteTag(widget.tagName);
+              });
             });
-          }
-        );
       } else {
         return _errorView(json["error"]["message_en"]);
       }
@@ -76,9 +75,8 @@ class _TagState extends State<Tag> {
     }
   }
 
-  Widget _errorView(String message) => Padding(
-      padding: EdgeInsets.only(left: 16),
-      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+  Widget _errorView(String message) =>
+      Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
         Expanded(child: Text(message, style: TextStyle(color: Colors.red))),
         FlatButton(
           child: Icon(Icons.refresh),
@@ -88,5 +86,5 @@ class _TagState extends State<Tag> {
             });
           },
         )
-      ]));
+      ]);
 }

@@ -60,11 +60,11 @@ class _TagsState extends State<Tags> {
       body: FutureBuilder(
         future: widget._tagStorage.fetchTags(),
         builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-          return CommonWidgets.handleFuture(snapshot, (data) {
+          return CommonWidgets.handleFuture(snapshot, (json) {
             return ListView.builder(
-              itemCount: (data as List<String>).length,
+              itemCount: (json as List<String>).length,
               itemBuilder: (BuildContext context, index) =>
-                  _tagItem((data as List<String>)[index]),
+                  _tagItem((json as List<String>)[index]),
             );
           });
         },
