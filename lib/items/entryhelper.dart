@@ -5,20 +5,23 @@ import 'package:w_reader/api/api.dart';
 import 'item.dart';
 
 class EntryHelper {
-
   Widget buildEntry(BuildContext context, dynamic entry,
       {hideComments = false, hidePhoto = false}) {
     var embed = entry["embed"];
     if (!hidePhoto && embed != null) {
       return Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[createEmbed(embed), _buildEntryContents(context, entry, hideComments: hideComments)]));
+              children: <Widget>[
+                createEmbed(embed),
+                _buildEntryContents(context, entry, hideComments: hideComments)
+              ]));
     } else {
       return Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: _buildEntryContents(context, entry, hideComments: hideComments));
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child:
+              _buildEntryContents(context, entry, hideComments: hideComments));
     }
   }
 
@@ -32,13 +35,11 @@ class EntryHelper {
   }
 
   Widget _createPreviewImage(String previewUrl, String url) {
-    return Padding(
-        padding: EdgeInsets.only(bottom: 8),
-        child: InkWell(
-            child: Image.network(previewUrl),
-            onTap: () {
-              launchURL(url);
-            }));
+    return InkWell(
+        child: Image.network(previewUrl),
+        onTap: () {
+          launchURL(url);
+        });
   }
 
   Widget _buildEntryContents(BuildContext context, dynamic entry,
@@ -46,9 +47,12 @@ class EntryHelper {
     var comments;
     if (!hideComments) {
       comments = InkWell(
-        child: Text("Comments count: ${entry["comments_count"]}",
-            style: TextStyle(
-                color: Colors.black45, decoration: TextDecoration.underline)),
+        child: Padding(
+            padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),
+            child: Text("Comments count: ${entry["comments_count"]}",
+                style: TextStyle(
+                    color: Colors.black45,
+                    decoration: TextDecoration.underline))),
         onTap: () {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => Item(entry["id"])));
@@ -67,8 +71,11 @@ class EntryHelper {
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Expanded(
-                      child: Text(entry["date"],
-                          style: TextStyle(color: Colors.black45))),
+                      child: Padding(
+            padding: EdgeInsets.only(top: 8, bottom: 8),
+                        child: Text(entry["date"],
+                          style: TextStyle(color: Colors.black45)))
+                  ),
                   comments
                 ],
               )),

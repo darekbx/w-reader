@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:w_reader/api/api.dart';
 import 'package:w_reader/localstorage.dart';
 import 'package:w_reader/commonwidgets.dart';
@@ -35,7 +34,6 @@ class _ItemState extends State<Item> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.entryId);
     return Scaffold(
         appBar: AppBar(title: Text("Entry")),
         body: FutureBuilder(
@@ -49,7 +47,12 @@ class _ItemState extends State<Item> {
   }
 
   Widget _buildHeader(BuildContext context, dynamic data) {
-    return widget.entryHelper.buildEntry(context, data, hideComments: true);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+         widget.entryHelper.buildEntry(context, data, hideComments: true),
+         Divider(color: Colors.black)
+      ]);
   }
 
   Widget _buildCommentsList(BuildContext context, dynamic data) {
@@ -57,37 +60,40 @@ class _ItemState extends State<Item> {
     return ListView.builder(
         itemCount: comments.length + 1,
         itemBuilder: (BuildContext context, index) {
-          
           if (index == 0) {
             return _buildHeader(context, data);
           }
 
           var comment = comments[index - 1];
+          return _buildSingleComment(comment);
+        });
+  }
 
-          return Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Column(
+  Widget _buildSingleComment(dynamic comment) {
+    return Padding(
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Expanded(
+                          child: Text(comment["date"],
+                              style: TextStyle(color: Colors.black45))),
+                      Text(comment["author"]["login"],
+                          style: TextStyle(color: Colors.black45))
+                    ],
+                  )),
+              Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
-                        padding: EdgeInsets.only(bottom: 4),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Expanded(
-                                child: Text(comment["date"],
-                                    style: TextStyle(color: Colors.black45))),
-                            Text(comment["author"]["login"],
-                                style: TextStyle(color: Colors.black45))
-                          ],
-                        )),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          widget.entryHelper.createEmbed(comment["embed"]),
-                          widget.entryHelper.handleHtml(comment["body"])
-                        ])
-                  ]));
-        });
+                    widget.entryHelper.createEmbed(comment["embed"]),
+                    widget.entryHelper.handleHtml(comment["body"])
+                  ]),
+         Divider(color: Colors.black45)
+            ]));
   }
 }

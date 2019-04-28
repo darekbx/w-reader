@@ -7,7 +7,7 @@ import 'package:w_reader/settings/settings.dart';
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
 
-  final _tagStorage = LocalStorage();
+  final _localStorage = LocalStorage();
 
   @override
   _ReaderPageState createState() => _ReaderPageState();
@@ -27,7 +27,6 @@ class _ReaderPageState extends State<ReaderPage>
 
     _tags.reload = () => _loadTagsCount();
     _loadTagsCount();
-
     super.initState();
   }
 
@@ -37,8 +36,24 @@ class _ReaderPageState extends State<ReaderPage>
     super.dispose();
   }
 
+  Future<Widget> _checkApiKeyAndBuild(BuildContext context) async {
+    if (await widget._localStorage.getApiKey() == null) {
+      //showDialog();
+      return Scaffold(
+            appBar: AppBar(
+              title: Text("Reader"),
+              actions: <Widget>[
+                _buildSettingsAction(context)
+              ]
+            ),
+            body: Center(child: Text("No api key, please provide key in settings screen.")));
+    } else {
+      return _buildPage(context);
+    }
+  }
+
   void _loadTagsCount() async {
-    var count = await widget._tagStorage.countTags();
+    var count = await widget._localStorage.countTags();
 
     setState(() {
       _tagsCount = count;
@@ -53,19 +68,21 @@ class _ReaderPageState extends State<ReaderPage>
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _checkApiKeyAndBuild(context),
+      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+        return snapshot.data;
+      });
+  }
+
+  Widget _buildPage(BuildContext context) {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
             appBar: AppBar(
               title: Text("Reader"),
               actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Settings()));
-                  },
-                ),
+                _buildSettingsAction(context)
               ],
               bottom: TabBar(controller: _tabController, tabs: _tabs),
             ),
@@ -73,6 +90,16 @@ class _ReaderPageState extends State<ReaderPage>
               controller: _tabController,
               children: <Widget>[_newsFeed, _tags],
             )));
+  }
+
+  Widget _buildSettingsAction(BuildContext context) {
+    return IconButton(
+                  icon: Icon(Icons.settings),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Settings()));
+                  },
+                );
   }
 
   void _loadTabs() {
