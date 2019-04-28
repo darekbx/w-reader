@@ -38,15 +38,13 @@ class _ReaderPageState extends State<ReaderPage>
 
   Future<Widget> _checkApiKeyAndBuild(BuildContext context) async {
     if (await widget._localStorage.getApiKey() == null) {
-      //showDialog();
       return Scaffold(
-            appBar: AppBar(
+          appBar: AppBar(
               title: Text("Reader"),
-              actions: <Widget>[
-                _buildSettingsAction(context)
-              ]
-            ),
-            body: Center(child: Text("No api key, please provide key in settings screen.")));
+              actions: <Widget>[_buildSettingsAction(context)]),
+          body: Center(
+              child:
+                  Text("No api key, please provide key in settings screen.")));
     } else {
       return _buildPage(context);
     }
@@ -69,10 +67,10 @@ class _ReaderPageState extends State<ReaderPage>
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _checkApiKeyAndBuild(context),
-      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-        return snapshot.data;
-      });
+        future: _checkApiKeyAndBuild(context),
+        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+          return snapshot.data;
+        });
   }
 
   Widget _buildPage(BuildContext context) {
@@ -81,9 +79,7 @@ class _ReaderPageState extends State<ReaderPage>
         child: Scaffold(
             appBar: AppBar(
               title: Text("Reader"),
-              actions: <Widget>[
-                _buildSettingsAction(context)
-              ],
+              actions: <Widget>[_buildSettingsAction(context)],
               bottom: TabBar(controller: _tabController, tabs: _tabs),
             ),
             body: TabBarView(
@@ -94,12 +90,12 @@ class _ReaderPageState extends State<ReaderPage>
 
   Widget _buildSettingsAction(BuildContext context) {
     return IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Settings()));
-                  },
-                );
+      icon: Icon(Icons.settings),
+      onPressed: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Settings()));
+      },
+    );
   }
 
   void _loadTabs() {

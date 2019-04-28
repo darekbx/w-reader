@@ -72,10 +72,9 @@ class EntryHelper {
                 children: <Widget>[
                   Expanded(
                       child: Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
-                        child: Text(entry["date"],
-                          style: TextStyle(color: Colors.black45)))
-                  ),
+                          padding: EdgeInsets.only(top: 8, bottom: 8),
+                          child: Text(entry["date"],
+                              style: TextStyle(color: Colors.black45)))),
                   comments
                 ],
               )),
