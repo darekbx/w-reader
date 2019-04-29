@@ -5,8 +5,32 @@ import 'package:w_reader/api/api.dart';
 import 'item.dart';
 
 class EntryHelper {
+  Widget buildItem(BuildContext context, dynamic item, String type,
+      {hideComments = false}) {
+    if (type == "entry") {
+      return buildEntry(context, item, hideComments: hideComments);
+    } else {
+      return buildLink(context, item, hideComments: hideComments);
+    }
+  }
+
+  Widget buildLink(BuildContext context, dynamic link, {hideComments = false}) {
+    link["body"] = link["description"];
+    link["type"] = "link";
+    return Padding(
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              createEmbed(
+                  {"url": link["source_url"], "preview": link["preview"]}),
+              _buildContents(context, link, hideComments: hideComments)
+            ]));
+  }
+
   Widget buildEntry(BuildContext context, dynamic entry,
       {hideComments = false, hidePhoto = false}) {
+    entry["type"] = "entry";
     var embed = entry["embed"];
     if (!hidePhoto && embed != null) {
       return Padding(
@@ -15,13 +39,12 @@ class EntryHelper {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 createEmbed(embed),
-                _buildEntryContents(context, entry, hideComments: hideComments)
+                _buildContents(context, entry, hideComments: hideComments)
               ]));
     } else {
       return Padding(
           padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child:
-              _buildEntryContents(context, entry, hideComments: hideComments));
+          child: _buildContents(context, entry, hideComments: hideComments));
     }
   }
 
@@ -42,20 +65,21 @@ class EntryHelper {
         });
   }
 
-  Widget _buildEntryContents(BuildContext context, dynamic entry,
+  Widget _buildContents(BuildContext context, dynamic data,
       {hideComments = false}) {
     var comments;
     if (!hideComments) {
       comments = InkWell(
         child: Padding(
             padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),
-            child: Text("Comments count: ${entry["comments_count"]}",
+            child: Text("Comments count: ${data["comments_count"]}",
                 style: TextStyle(
                     color: Colors.black45,
                     decoration: TextDecoration.underline))),
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => Item(entry["id"])));
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Item(data["id"], data["type"]);
+          }));
         },
       );
     } else {
@@ -73,16 +97,19 @@ class EntryHelper {
                   Expanded(
                       child: Padding(
                           padding: EdgeInsets.only(top: 8, bottom: 8),
-                          child: Text(entry["date"],
+                          child: Text(data["date"],
                               style: TextStyle(color: Colors.black45)))),
                   comments
                 ],
               )),
-          handleHtml(entry['body'])
+          handleHtml(data['body'])
         ]);
   }
 
   Widget handleHtml(String html) {
+    if (html == null) {  
+      return Text("");
+    }
     return Html(
         data: html,
         onLinkTap: (url) {
@@ -94,7 +121,6 @@ class EntryHelper {
   }
 
   launchURL(String url) async {
-    print(url);
     if (await canLaunch(url)) {
       await launch(url);
     } else {

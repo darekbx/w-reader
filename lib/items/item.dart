@@ -6,10 +6,11 @@ import 'package:w_reader/commonwidgets.dart';
 import 'entryhelper.dart';
 
 class Item extends StatefulWidget {
-  final int entryId;
+  final int itemId;
+  final String type;
   final entryHelper = EntryHelper();
 
-  Item(this.entryId);
+  Item(this.itemId, this.type);
 
   @override
   _ItemState createState() => _ItemState();
@@ -34,25 +35,34 @@ class _ItemState extends State<Item> {
 
   @override
   Widget build(BuildContext context) {
+    var future;
+    if (widget.type == "entry") {
+      future = Api(_apiKey).loadEntry(widget.itemId);
+    } else {
+      future = Api(_apiKey).loadLink(widget.itemId);
+    }
     return Scaffold(
         appBar: AppBar(title: Text("Entry")),
-        body: FutureBuilder(
-            future: Api(_apiKey).loadEntry(widget.entryId),
+        body: Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: FutureBuilder(
+            future: future,
             builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               return CommonWidgets.handleFuture(snapshot, (jsonString) {
                 var json = JsonDecoder().convert(jsonString);
                 return _buildCommentsList(context, json["data"]);
               });
-            }));
+            })));
   }
 
   Widget _buildHeader(BuildContext context, dynamic data) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-         widget.entryHelper.buildEntry(context, data, hideComments: true),
-         Divider(color: Colors.black)
-      ]);
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          widget.entryHelper
+              .buildItem(context, data, widget.type, hideComments: true),
+          Divider(color: Colors.black)
+        ]);
   }
 
   Widget _buildCommentsList(BuildContext context, dynamic data) {
@@ -93,7 +103,7 @@ class _ItemState extends State<Item> {
                     widget.entryHelper.createEmbed(comment["embed"]),
                     widget.entryHelper.handleHtml(comment["body"])
                   ]),
-         Divider(color: Colors.black45)
+              Divider(color: Colors.black45)
             ]));
   }
 }

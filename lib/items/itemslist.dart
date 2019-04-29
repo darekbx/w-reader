@@ -18,12 +18,15 @@ class _ItemsListState extends State<ItemsList> {
     var list = (widget.data["data"] as List);
     return Scaffold(
         appBar: AppBar(title: Text("#${widget.tagName}")),
-        body: ListView.separated(
-          separatorBuilder: (BuildContext context, index) =>
-              Divider(color: Colors.black),
-          itemCount: list.length,
-          itemBuilder: (BuildContext context, index) => _buildItem(context, list[index]),
-        ));
+        body: Padding(
+            padding: EdgeInsets.only(top: 8),
+            child: ListView.separated(
+              separatorBuilder: (BuildContext context, index) =>
+                  Divider(color: Colors.black),
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, index) =>
+                  _buildItem(context, list[index]),
+            )));
   }
 
   Widget _buildItem(BuildContext context, dynamic row) {
@@ -31,13 +34,8 @@ class _ItemsListState extends State<ItemsList> {
     if (type == "entry") {
       return widget.entryHelper.buildEntry(context, row["entry"]);
     } else if (type == "link") {
-      return _buildLink(row["link"]);
+      return widget.entryHelper.buildLink(context, row["link"]);
     }
     return Text("Unknown type");
-  }
-
-
-  Widget _buildLink(dynamic link) {
-    return Padding(padding: EdgeInsets.all(16), child: Text("link"));
   }
 }

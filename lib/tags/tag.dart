@@ -37,25 +37,34 @@ class _TagState extends State<Tag> {
     return FutureBuilder(
       future: Api(_apiKey)
           .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<MapEntry<int, String>> snapshot) {
         return Padding(
             padding: EdgeInsets.all(16),
-            child: CommonWidgets.handleFuture(snapshot, (jsonString) {
+            child: CommonWidgets.handleFuture(snapshot, (data) {
               _forceRefresh = false;
-              return _tagView(jsonString as String);
+              return _tagView(data);
             }));
       },
     );
   }
 
-  Widget _tagView(String jsonString) {
-    if (jsonString.isNotEmpty) {
-      var json = JsonDecoder().convert(jsonString);
+  Widget _tagView(MapEntry<int, String> data) {
+    if (data.value.isNotEmpty) {
+      var json = JsonDecoder().convert(data.value);
       if (json["error"] == null) {
-        var total = json["meta"]["counters"]["total"];
+        var total = json["meta"]["counters"]["total"] as int;
+        var toDisplay = total;
+        var diff = total - data.key;
+        var hasNew = diff > 0;
+        var style = TextStyle();
+        if (hasNew) {
+          toDisplay = diff;
+          style = TextStyle(fontWeight: FontWeight.bold);
+        }
         return InkWell(
-            child: Text("#${widget.tagName} ($total)"),
+            child: Text("#${widget.tagName} ($toDisplay)", style: style),
             onTap: () {
+              _localStorage.setTagCount(widget.tagName, total);
               Navigator.push(
                   context,
                   MaterialPageRoute(
