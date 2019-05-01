@@ -18,6 +18,7 @@ class _TagState extends State<Tag> {
   var _localStorage = LocalStorage();
   var _forceRefresh = false;
   var _apiKey;
+  var _isDeleted = false;
 
   @override
   void initState() {
@@ -34,6 +35,12 @@ class _TagState extends State<Tag> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isDeleted) {
+      return Padding(
+            padding: EdgeInsets.all(16),
+            child: Text("Deleted", style: TextStyle(color: Colors.black45))
+      );
+    }
     return FutureBuilder(
       future: Api(_apiKey)
           .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
@@ -72,8 +79,10 @@ class _TagState extends State<Tag> {
             },
             onLongPress: () {
               setState(() {
-                // TODO: Reload tags
                 _localStorage.deleteTag(widget.tagName);
+                setState(() {
+                  _isDeleted = true;
+                });
               });
             });
       } else {
