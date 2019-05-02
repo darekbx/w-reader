@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'entryhelper.dart';
+import 'dart:convert';
+import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/api/api.dart';
 
 class ItemsList extends StatefulWidget {
   final dynamic data;
@@ -13,19 +16,63 @@ class ItemsList extends StatefulWidget {
 }
 
 class _ItemsListState extends State<ItemsList> {
+  ScrollController _scrollController;
+  var _localStorage = LocalStorage();
+  var _apiKey;
+  var _nextPageData;
+  List<dynamic> _itemsList;
+
+  @override
+  void initState() {
+    _itemsList = widget.data["data"] as List<dynamic>;
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    super.initState();
+    _loadApiKey();
+  }
+
+  void _loadApiKey() async {
+    var apiKey = await _localStorage.getApiKey();
+    setState(() {
+      _apiKey = apiKey;
+    });
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      _loadNextPage();
+    }
+  }
+
+  void _loadNextPage() async {
+    // TODO: add progress bar for loading next page
+    var data = getData();
+    var pagination = data["pagination"];
+    if (pagination != null && pagination["next"] != null) {
+      var nextPageData = await Api(_apiKey).loadUrl(pagination["next"]);
+      setState(() {
+        _nextPageData = JsonDecoder().convert(nextPageData);
+        _itemsList.addAll(_nextPageData["data"] as List<dynamic>);
+      });
+    }
+  }
+
+  dynamic getData() => _nextPageData != null ?_nextPageData : widget.data;
+
   @override
   Widget build(BuildContext context) {
-    var list = (widget.data["data"] as List);
     return Scaffold(
         appBar: AppBar(title: Text("#${widget.tagName}")),
         body: Padding(
             padding: EdgeInsets.only(top: 8),
             child: ListView.separated(
+              controller: _scrollController,
               separatorBuilder: (BuildContext context, index) =>
                   Divider(color: Colors.black),
-              itemCount: list.length,
+              itemCount: _itemsList.length,
               itemBuilder: (BuildContext context, index) =>
-                  _buildItem(context, list[index]),
+                  _buildItem(context, _itemsList[index]),
             )));
   }
 
