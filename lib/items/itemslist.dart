@@ -46,7 +46,7 @@ class _ItemsListState extends State<ItemsList> {
   }
 
   void _loadNextPage() async {
-    // TODO: add progress bar for loading next page
+    _showLoadingDialog();
     var data = getData();
     var pagination = data["pagination"];
     if (pagination != null && pagination["next"] != null) {
@@ -54,8 +54,18 @@ class _ItemsListState extends State<ItemsList> {
       setState(() {
         _nextPageData = JsonDecoder().convert(nextPageData);
         _itemsList.addAll(_nextPageData["data"] as List<dynamic>);
+        Navigator.pop(context);
       });
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(child:CircularProgressIndicator());
+      }
+    );
   }
 
   dynamic getData() => _nextPageData != null ?_nextPageData : widget.data;
