@@ -9,7 +9,8 @@ class CommonWidgets {
         return loadingView();
       default:
         if (snapshot.hasError) {
-          return error("snapshot.error");
+          print(snapshot);
+          return error("${snapshot.error}");
         } else {
           if (snapshot.data == null) {
             return error("Error :( ");
