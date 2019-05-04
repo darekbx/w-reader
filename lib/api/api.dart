@@ -12,6 +12,11 @@ class Api {
   static String tagUrl(String tag) => "https://www.wykop.pl/tag/$tag";
   static String itemUrl(int id) => "https://www.wykop.pl/wpis/$id";
 
+  Future<String> loadPromotedLinks({int page = 1, bool forceRefresh = false}) async {
+    var url = "$_endpoint/links/promoted/page/$page/appkey/aNd401dAPp";
+    return await _fetchCachedString("promoted", url, forceRefresh: forceRefresh);
+  }
+
   Future<String> loadUrl(String url, {bool forceRefresh = false}) async {
     return await _fetchCachedString(url, url, forceRefresh: forceRefresh);
   }

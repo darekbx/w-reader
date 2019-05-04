@@ -58,6 +58,9 @@ class EntryHelper {
   }
 
   Widget _createPreviewImage(String previewUrl, String url) {
+    if (url == null) { 
+      return Text("Invalid image!");
+    }
     return InkWell(
         child: Image.network(previewUrl),
         onTap: () {
