@@ -102,12 +102,12 @@ class EntryHelper {
                   comments
                 ],
               )),
-          handleHtml(data['body'])
+          handleHtml(context, data['body'])
         ]);
   }
 
-  Widget handleHtml(String html) {
-    if (html == null) {  
+  Widget handleHtml(BuildContext context, String html) {
+    if (html == null) {
       return Text("");
     }
     return Html(
@@ -116,7 +116,28 @@ class EntryHelper {
           if (url[0] == "#") {
             url = Api.tagUrl(url.substring(1));
           }
+          if (url.startsWith("spoiler:")) {
+            _showSpoiler(context, Uri.decodeFull(url.substring(8)));
+            return;
+          }
           launchURL(url);
+        });
+  }
+
+  _showSpoiler(BuildContext context, String spoiler) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text(spoiler),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text("Close"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  })
+            ],
+          );
         });
   }
 

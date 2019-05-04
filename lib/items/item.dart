@@ -101,7 +101,7 @@ class _ItemState extends State<Item> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     widget.entryHelper.createEmbed(comment["embed"]),
-                    widget.entryHelper.handleHtml(comment["body"])
+                    widget.entryHelper.handleHtml(context, comment["body"])
                   ]),
               Divider(color: Colors.black45)
             ]));

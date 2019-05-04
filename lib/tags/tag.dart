@@ -37,20 +37,18 @@ class _TagState extends State<Tag> {
   Widget build(BuildContext context) {
     if (_isDeleted) {
       return Padding(
-            padding: EdgeInsets.all(16),
-            child: Text("Deleted", style: TextStyle(color: Colors.black45))
-      );
+          padding: EdgeInsets.all(16),
+          child: Text("Deleted", style: TextStyle(color: Colors.black45)));
     }
     return FutureBuilder(
       future: Api(_apiKey)
           .loadTagContents(widget.tagName, forceRefresh: _forceRefresh),
-      builder: (BuildContext context, AsyncSnapshot<MapEntry<int, String>> snapshot) {
-        return Padding(
-            padding: EdgeInsets.all(16),
-            child: CommonWidgets.handleFuture(snapshot, (data) {
-              _forceRefresh = false;
-              return _tagView(data);
-            }));
+      builder: (BuildContext context,
+          AsyncSnapshot<MapEntry<int, String>> snapshot) {
+        return CommonWidgets.handleFuture(snapshot, (data) {
+          _forceRefresh = false;
+          return _tagView(data);
+        });
       },
     );
   }
@@ -69,7 +67,9 @@ class _TagState extends State<Tag> {
           style = TextStyle(fontWeight: FontWeight.bold);
         }
         return InkWell(
-            child: Text("#${widget.tagName} ($toDisplay)", style: style),
+            child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text("#${widget.tagName} ($toDisplay)", style: style)),
             onTap: () {
               _localStorage.setTagCount(widget.tagName, total);
               Navigator.push(

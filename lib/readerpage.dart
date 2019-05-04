@@ -3,6 +3,7 @@ import 'package:w_reader/newsfeed/newsfeed.dart';
 import 'package:w_reader/tags/tags.dart';
 import 'package:w_reader/localstorage.dart';
 import 'package:w_reader/settings/settings.dart';
+import 'commonwidgets.dart';
 
 class ReaderPage extends StatefulWidget {
   ReaderPage({Key key}) : super(key: key);
@@ -69,7 +70,9 @@ class _ReaderPageState extends State<ReaderPage>
     return FutureBuilder(
         future: _checkApiKeyAndBuild(context),
         builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-          return snapshot.data;
+          return CommonWidgets.handleFuture(snapshot, (data) {
+            return data;
+          });
         });
   }
 

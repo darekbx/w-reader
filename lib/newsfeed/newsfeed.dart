@@ -11,6 +11,6 @@ class _NewsFeedState extends State<NewsFeed> {
   
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("TODO"));
+    return Center(child: Text("TODO "));
   }
 }
