@@ -56,7 +56,8 @@ class _NewsFeedState extends State<NewsFeed> {
       var data = json["data"] as List;
       return ListView.builder(
         itemCount: data.length,
-        itemBuilder: (BuildContext context, index) => widget.entryHelper.buildLink(context, data[index]),
+        itemBuilder: (BuildContext context, index) => 
+          widget.entryHelper.buildLink(context, data[index], extended: true),
       );
     }
   }

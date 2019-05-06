@@ -14,18 +14,40 @@ class EntryHelper {
     }
   }
 
-  Widget buildLink(BuildContext context, dynamic link, {hideComments = false}) {
+  Widget buildLink(BuildContext context, dynamic link,
+      {hideComments = false, extended = false}) {
     link["body"] = link["description"];
     link["type"] = "link";
+    var preview = link["preview"] as String;
+    if (preview != null) {
+      preview = preview.replaceAll(",w104h74", "");
+    }
+    var title;
+    var divider;
+    if (extended) {
+      divider = Divider();
+      title = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(bottom: 8, top: 8),
+                child: Text(link["title"],
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
+          ]);
+    }
+    bool notNull(Object o) => o != null;
     return Padding(
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, extended ? 0 : 8),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              title,
               createEmbed(
-                  {"url": link["source_url"], "preview": link["preview"]}),
-              _buildContents(context, link, hideComments: hideComments)
-            ]));
+                  {"url": link["source_url"], "preview": preview}),
+              _buildContents(context, link, hideComments: hideComments),
+              divider
+            ].where(notNull).toList()));
   }
 
   Widget buildEntry(BuildContext context, dynamic entry,
@@ -49,7 +71,7 @@ class EntryHelper {
   }
 
   Widget createEmbed(dynamic embed) {
-    if (embed != null) {
+    if (embed != null && embed["preview"] != null) {
       var preview = embed["preview"];
       var url = embed["url"];
       return _createPreviewImage(preview, url);
@@ -58,7 +80,7 @@ class EntryHelper {
   }
 
   Widget _createPreviewImage(String previewUrl, String url) {
-    if (url == null) { 
+    if (url == null) {
       return Text("Invalid image!");
     }
     return InkWell(
