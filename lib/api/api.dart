@@ -13,7 +13,7 @@ class Api {
   static String itemUrl(int id) => "https://www.wykop.pl/wpis/$id";
 
   Future<String> loadPromotedLinks({int page = 1, bool forceRefresh = false}) async {
-    var url = "$_endpoint/links/promoted/page/$page/appkey/aNd401dAPp";
+    var url = "$_endpoint/links/promoted/page/$page/appkey/$apiKey";
     return await _fetchCachedString("promoted", url, forceRefresh: forceRefresh);
   }
 

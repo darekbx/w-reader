@@ -15,12 +15,18 @@ class NewsFeed extends StatefulWidget {
 }
 
 class _NewsFeedState extends State<NewsFeed> {
+  ScrollController _scrollController;
   var _localStorage = LocalStorage();
   var _forceRefresh = false;
   var _apiKey;
+  var _paginationInfo;
+  var _errorMessage;
+  List<dynamic> _itemsList;
   
   @override
   void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     super.initState();
     _loadApiKey();
   }
@@ -31,35 +37,70 @@ class _NewsFeedState extends State<NewsFeed> {
       _apiKey = apiKey;
     });
   }
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Api(_apiKey).loadPromotedLinks(forceRefresh: _forceRefresh),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        return CommonWidgets.handleFuture(snapshot, (data) {
-          _forceRefresh = false;
-          return _buildList(data);
-        });
-      }
-    );
+
+  void _scrollListener() {
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+        !_scrollController.position.outOfRange) {
+      _loadNextPage();
+    }
   }
 
-  Widget _buildList(String jsonString) {
+  void _loadNextPage() async {
+    CommonWidgets.showLoadingDialog(context);
+    if (_paginationInfo != null && _paginationInfo["next"] != null) {
+      var nextPageData = await Api(_apiKey).loadUrl(_paginationInfo["next"]);
+      setState(() {
+        _appendToList(nextPageData);
+        Navigator.pop(context);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_itemsList == null) {
+      return FutureBuilder(
+        future: Api(_apiKey).loadPromotedLinks(forceRefresh: _forceRefresh),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          return CommonWidgets.handleFuture(snapshot, (data) {
+            _itemsList = List();
+            _forceRefresh = false;
+            _appendToList(data);
+            return _buildList();
+          });
+        }
+      );
+    } else {
+      return _buildList();
+    }
+  }
+
+  _appendToList(String jsonString) {
     if (jsonString == null || jsonString.isEmpty) {
-      return _errorView("Empty data!");
+      _errorMessage = "Empty data!";
+      return;
     }
     var json = JsonDecoder().convert(jsonString);
-
     if (json["error"] != null) {
-        return _errorView(json["error"]["message_en"]);
+        _errorMessage = json["error"]["message_en"];
+        return;
     } else {
-      var data = json["data"] as List;
-      return ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (BuildContext context, index) => 
-          widget.entryHelper.buildLink(context, data[index], extended: true),
-      );
+      _itemsList.addAll(json["data"] as List);
+      _paginationInfo = json["pagination"];
+      _errorMessage = null;
     }
+  }
+
+  Widget _buildList() {
+    if (_errorMessage != null) {
+      return _errorView(_errorMessage);
+    }
+    return ListView.builder(
+        controller: _scrollController,
+        itemCount: _itemsList.length,
+        itemBuilder: (BuildContext context, index) => 
+          widget.entryHelper.buildLink(context, _itemsList[index], extended: true),
+      );
   }
 
   Widget _errorView(String message) =>

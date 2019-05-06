@@ -3,6 +3,7 @@ import 'entryhelper.dart';
 import 'dart:convert';
 import 'package:w_reader/localstorage.dart';
 import 'package:w_reader/api/api.dart';
+import 'package:w_reader/commonwidgets.dart';
 
 class ItemsList extends StatefulWidget {
   final dynamic data;
@@ -20,6 +21,7 @@ class _ItemsListState extends State<ItemsList> {
   var _localStorage = LocalStorage();
   var _apiKey;
   var _nextPageData;
+  var _page = 0;
   List<dynamic> _itemsList;
 
   @override
@@ -46,26 +48,18 @@ class _ItemsListState extends State<ItemsList> {
   }
 
   void _loadNextPage() async {
-    _showLoadingDialog();
+    CommonWidgets.showLoadingDialog(context);
     var data = getData();
     var pagination = data["pagination"];
     if (pagination != null && pagination["next"] != null) {
       var nextPageData = await Api(_apiKey).loadUrl(pagination["next"]);
       setState(() {
+        _page++;
         _nextPageData = JsonDecoder().convert(nextPageData);
         _itemsList.addAll(_nextPageData["data"] as List<dynamic>);
         Navigator.pop(context);
       });
     }
-  }
-
-  void _showLoadingDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Center(child:CircularProgressIndicator());
-      }
-    );
   }
 
   dynamic getData() => _nextPageData != null ?_nextPageData : widget.data;

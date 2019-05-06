@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CommonWidgets {
+
   static handleFuture(
       AsyncSnapshot<dynamic> snapshot, Function(dynamic) callback) {
     switch (snapshot.connectionState) {
@@ -19,6 +20,15 @@ class CommonWidgets {
           }
         }
     }
+  }
+
+  static showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(child:CircularProgressIndicator());
+      }
+    );
   }
 
   static loadingView() => Padding(
