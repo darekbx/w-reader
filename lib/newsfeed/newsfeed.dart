@@ -46,11 +46,19 @@ class _NewsFeedState extends State<NewsFeed> {
   }
 
   void _loadNextPage() async {
+    var startPosition = _scrollController.position.pixels;
     CommonWidgets.showLoadingDialog(context);
     if (_paginationInfo != null && _paginationInfo["next"] != null) {
       var nextPageData = await Api(_apiKey).loadUrl(_paginationInfo["next"]);
       setState(() {
         _appendToList(nextPageData);
+
+        Future.delayed(Duration(microseconds: 10)).then((a) {
+          setState(() {
+            _scrollController.jumpTo(startPosition);
+          });
+        });
+        
         Navigator.pop(context);
       });
     }

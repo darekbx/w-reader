@@ -21,7 +21,6 @@ class _ItemsListState extends State<ItemsList> {
   var _localStorage = LocalStorage();
   var _apiKey;
   var _nextPageData;
-  var _page = 0;
   List<dynamic> _itemsList;
 
   @override
@@ -54,7 +53,6 @@ class _ItemsListState extends State<ItemsList> {
     if (pagination != null && pagination["next"] != null) {
       var nextPageData = await Api(_apiKey).loadUrl(pagination["next"]);
       setState(() {
-        _page++;
         _nextPageData = JsonDecoder().convert(nextPageData);
         _itemsList.addAll(_nextPageData["data"] as List<dynamic>);
         Navigator.pop(context);
