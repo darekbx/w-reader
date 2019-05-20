@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:w_reader/newsfeed/newsfeed.dart';
 import 'package:w_reader/tags/tags.dart';
+import 'package:w_reader/savedlinks/savedlinks.dart';
 import 'package:w_reader/localstorage.dart';
 import 'package:w_reader/settings/settings.dart';
 import 'commonwidgets.dart';
@@ -17,8 +18,11 @@ class ReaderPage extends StatefulWidget {
 class _ReaderPageState extends State<ReaderPage>
     with SingleTickerProviderStateMixin {
   NewsFeed _newsFeed = NewsFeed();
-  int _tagsCount = 0;
+  SavedLinks _savedLinks = SavedLinks();
   Tags _tags = Tags();
+
+  int _tagsCount = 0;
+  int _savedLinksCount = 0;
   List<Tab> _tabs;
   TabController _tabController;
 
@@ -78,7 +82,7 @@ class _ReaderPageState extends State<ReaderPage>
 
   Widget _buildPage(BuildContext context) {
     return DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
             appBar: AppBar(
               title: Text("Reader"),
@@ -87,7 +91,7 @@ class _ReaderPageState extends State<ReaderPage>
             ),
             body: TabBarView(
               controller: _tabController,
-              children: <Widget>[_newsFeed, _tags],
+              children: <Widget>[_newsFeed, _savedLinks, _tags],
             )));
   }
 
@@ -102,6 +106,10 @@ class _ReaderPageState extends State<ReaderPage>
   }
 
   void _loadTabs() {
-    _tabs = <Tab>[Tab(text: "News feed"), Tab(text: "Tags ($_tagsCount)")];
+    _tabs = <Tab>[
+      Tab(text: "News feed"),
+      Tab(text: "Saved links ($_savedLinksCount)"),
+      Tab(text: "Tags ($_tagsCount)")
+    ];
   }
 }
