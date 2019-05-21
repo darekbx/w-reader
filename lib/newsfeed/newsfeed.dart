@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/repository/localstorage.dart';
 import 'package:w_reader/api/api.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'package:w_reader/items/entryhelper.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/repository/localstorage.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'tag.dart';
 

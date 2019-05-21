@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:w_reader/newsfeed/newsfeed.dart';
 import 'package:w_reader/tags/tags.dart';
 import 'package:w_reader/savedlinks/savedlinks.dart';
-import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/repository/localstorage.dart';
 import 'package:w_reader/settings/settings.dart';
 import 'commonwidgets.dart';
 

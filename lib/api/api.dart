@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:http/http.dart';
 import 'apicache.dart';
-import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/repository/localstorage.dart';
 
 class Api {
   Api(this.apiKey);

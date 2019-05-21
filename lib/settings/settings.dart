@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:w_reader/localstorage.dart';
+import 'package:w_reader/repository/localstorage.dart';
 
 class Settings extends StatefulWidget {
   Settings();
