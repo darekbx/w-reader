@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:w_reader/repository/localstorage.dart';
+import 'package:w_reader/repository/database.dart';
 
 class SavedLinks extends StatefulWidget {
   SavedLinks();
@@ -10,10 +10,18 @@ class SavedLinks extends StatefulWidget {
 
 class _SavedLinksState extends State<SavedLinks> {
 
+  int count = 0;
+
   @override
   Widget build(BuildContext context) {
+    _test();
     return Scaffold(
-      body: Text("Todo")
+      body: Text("Count: $count")
     );
+  }
+
+  _test() async {
+    var results = await DatabaseProvider.instance.list();
+    print(results);
   }
 }

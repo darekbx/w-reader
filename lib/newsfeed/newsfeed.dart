@@ -4,10 +4,12 @@ import 'package:w_reader/repository/localstorage.dart';
 import 'package:w_reader/api/api.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'package:w_reader/items/entryhelper.dart';
+import 'package:w_reader/repository/database.dart';
+import 'package:w_reader/model/savedlink.dart';
 
 class NewsFeed extends StatefulWidget {
   final entryHelper = EntryHelper();
-  
+
   NewsFeed();
 
   @override
@@ -107,7 +109,13 @@ class _NewsFeedState extends State<NewsFeed> {
         controller: _scrollController,
         itemCount: _itemsList.length,
         itemBuilder: (BuildContext context, index) => 
-          widget.entryHelper.buildLink(context, _itemsList[index], extended: true),
+        InkWell(
+          child: widget.entryHelper.buildLink(context, _itemsList[index], extended: true),
+          onLongPress: () async { 
+            var link = _itemsList[index];
+            _saveLink(link);
+          },
+        ),
       );
   }
 
@@ -123,4 +131,11 @@ class _NewsFeedState extends State<NewsFeed> {
           },
         )
       ]);
+
+    void _saveLink(dynamic link) async {
+      var savedLink = SavedLink(
+        null, link["id"], link["title"], link["description"], link["preview"]
+      );
+      await DatabaseProvider.instance.add(savedLink);
+    }
 }

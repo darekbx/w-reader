@@ -37,7 +37,7 @@ class DatabaseProvider {
       linkId INTEGER,
       title TEXT, 
       description TEXT, 
-      imageUrl TEXT,
+      imageUrl TEXT
     )""");
   }
 
