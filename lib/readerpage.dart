@@ -4,6 +4,7 @@ import 'package:w_reader/tags/tags.dart';
 import 'package:w_reader/savedlinks/savedlinks.dart';
 import 'package:w_reader/repository/localstorage.dart';
 import 'package:w_reader/settings/settings.dart';
+import 'repository/database.dart';
 import 'commonwidgets.dart';
 
 class ReaderPage extends StatefulWidget {
@@ -29,9 +30,8 @@ class _ReaderPageState extends State<ReaderPage>
   @override
   void initState() {
     _initializeTabController();
-
-    _tags.reload = () => _loadTagsCount();
-    _loadTagsCount();
+    _tags.reload = () => _reloadCounters();
+    _reloadCounters();
     super.initState();
   }
 
@@ -39,6 +39,16 @@ class _ReaderPageState extends State<ReaderPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _reloadCounters() async {
+       var tagsCount = await _loadTagsCount();
+       var savedLinksCount = await _loadSavedLinksCount();
+      setState(() {
+        _tagsCount = tagsCount;
+        _savedLinksCount = savedLinksCount;
+        _loadTabs();
+      });
   }
 
   Future<Widget> _checkApiKeyAndBuild(BuildContext context) async {
@@ -55,13 +65,13 @@ class _ReaderPageState extends State<ReaderPage>
     }
   }
 
-  void _loadTagsCount() async {
-    var count = await widget._localStorage.countTags();
+  Future<int> _loadTagsCount() async {
+    return await widget._localStorage.countTags();
+  }
 
-    setState(() {
-      _tagsCount = count;
-      _loadTabs();
-    });
+  Future<int> _loadSavedLinksCount() async {
+    var list = await DatabaseProvider.instance.list();
+    return list.length;
   }
 
   void _initializeTabController() {
