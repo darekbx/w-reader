@@ -101,7 +101,7 @@ class _ReaderPageState extends State<ReaderPage>
             ),
             body: TabBarView(
               controller: _tabController,
-              children: <Widget>[_newsFeed, _savedLinks, _tags],
+              children: <Widget>[_newsFeed, _tags, _savedLinks],
             )));
   }
 
@@ -118,8 +118,8 @@ class _ReaderPageState extends State<ReaderPage>
   void _loadTabs() {
     _tabs = <Tab>[
       Tab(text: "News feed"),
+      Tab(text: "Tags ($_tagsCount)"),
       Tab(text: "Saved links ($_savedLinksCount)"),
-      Tab(text: "Tags ($_tagsCount)")
     ];
   }
 }

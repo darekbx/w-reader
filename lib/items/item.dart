@@ -36,13 +36,16 @@ class _ItemState extends State<Item> {
   @override
   Widget build(BuildContext context) {
     var future;
+    var title;
     if (widget.type == "entry") {
+      title = "Entry id: ${widget.itemId}";
       future = Api(_apiKey).loadEntry(widget.itemId);
     } else {
+      title = "Link id: ${widget.itemId}";
       future = Api(_apiKey).loadLink(widget.itemId);
     }
     return Scaffold(
-        appBar: AppBar(title: Text("Entry")),
+        appBar: AppBar(title: Text(title)),
         body: Padding(
           padding: EdgeInsets.only(top: 8),
           child: FutureBuilder(

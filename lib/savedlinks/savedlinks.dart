@@ -3,9 +3,12 @@ import 'package:w_reader/repository/database.dart';
 import 'package:w_reader/commonwidgets.dart';
 import 'package:w_reader/model/savedlink.dart';
 import 'package:w_reader/items/entryhelper.dart';
+import 'package:w_reader/items/item.dart';
 
 class SavedLinks extends StatefulWidget {
   SavedLinks();
+
+  final EntryHelper entryHelper = EntryHelper();
 
   @override
   _SavedLinksState createState() => _SavedLinksState();
@@ -13,6 +16,7 @@ class SavedLinks extends StatefulWidget {
 
 class _SavedLinksState extends State<SavedLinks> {
   int count = 0;
+  var _links = List<SavedLink>();
 
   @override
   Widget build(BuildContext context) {
@@ -20,37 +24,67 @@ class _SavedLinksState extends State<SavedLinks> {
         body: Padding(
             padding: EdgeInsets.all(16),
             child: FutureBuilder(
-              future: _savedLinks(),
+              future: _fetchSavedLinks(),
               builder: (BuildContext contet, AsyncSnapshot<dynamic> snapshot) {
                 return CommonWidgets.handleFuture(snapshot, (data) {
-                  return _buildItemsList(data);
+                  _links = data;
+                  if (_links.length == 0) {
+                    return Center(child: Text("Empty list"));
+                  } else {
+                    return _buildItemsList(context);
+                  }
                 });
               },
             )));
   }
 
-  Widget _buildItemsList(List<SavedLink> items) {
+  Widget _buildItemsList(BuildContext context) {
     return ListView.builder(
-      itemCount: items.length,
-      itemBuilder: (BuildContext context, index) => _buildItem(items[index]),
+      itemCount: _links.length,
+      itemBuilder: (BuildContext context, index) =>
+          _buildItem(context, _links[index]),
     );
   }
 
-  Widget _buildItem(SavedLink link) {
+  Widget _buildItem(BuildContext context, SavedLink link) {
+    var image = link.imageUrl;
+    if (image != null) {
+      image = widget.entryHelper.prepareImage(image);
+    }
     return InkWell(
-      child: Text(link.title),
-      onTap: () {
-        
-        // TODO: open url or single link in new page?
-
-      },
-      onLongPress: () {
-
-        // TODO: remove on long press
-
-      },
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(link.title,
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+            Image.network(image),
+            Padding(
+                padding: EdgeInsets.only(top: 8),
+                child:
+                    widget.entryHelper.handleHtml(context, link.description)),
+            Divider()
+          ]),
+      onTap: () => _openLink(link),
+      onLongPress: () => _removeLink(link),
     );
   }
 
-  _savedLinks() async => await DatabaseProvider.instance.list();
+  _openLink(SavedLink link) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Item(link.linkId, "link");
+    }));
+  }
+
+  _removeLink(SavedLink link) async {
+    await DatabaseProvider.instance.delete(link.id);
+    var links = await _fetchSavedLinks();
+    setState(() {
+      _links = links;
+    });
+  }
+
+  _fetchSavedLinks() async => await DatabaseProvider.instance.list();
 }

@@ -20,7 +20,7 @@ class EntryHelper {
     link["type"] = "link";
     var preview = link["preview"] as String;
     if (preview != null) {
-      preview = preview.replaceAll(",w104h74", "");
+      preview = prepareImage(preview);
     }
     var title;
     var divider;
@@ -148,6 +148,8 @@ class EntryHelper {
           launchURL(url);
         });
   }
+
+  prepareImage(String url) => url.replaceAll(",w104h74", "");
 
   _showSpoiler(BuildContext context, String spoiler) {
     showDialog(
