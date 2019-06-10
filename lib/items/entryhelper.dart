@@ -93,7 +93,7 @@ class EntryHelper {
   Widget _buildContents(BuildContext context, dynamic data,
       {hideComments = false}) {
     var comments;
-    if (!hideComments) {
+    if (!hideComments && data["comments_count"] > 0) {
       comments = InkWell(
         child: Padding(
             padding: EdgeInsets.only(left: 8, top: 8, bottom: 8),

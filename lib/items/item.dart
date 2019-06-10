@@ -70,6 +70,9 @@ class _ItemState extends State<Item> {
 
   Widget _buildCommentsList(BuildContext context, dynamic data) {
     var comments = data["comments"];
+    if (comments == null || comments.length == 0) {
+      return Center(child: Text("No comments"));
+    }
     return ListView.builder(
         itemCount: comments.length + 1,
         itemBuilder: (BuildContext context, index) {
